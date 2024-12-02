@@ -6,10 +6,18 @@ RUN docker-php-ext-install pdo pdo_mysql
 # Habilitar módulos do Apache necessários
 RUN a2enmod rewrite headers
 
+# Configurar o PHP para desenvolvimento
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
 # Configurar o Apache
 RUN echo '\
 <Directory /var/www/html/>\n\
-    Options Indexes FollowSymLinks\n\
+    Options Indexes FollowSymLinks MultiViews\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>\n\
+<Directory /var/www/html/public/>\n\
+    Options Indexes FollowSymLinks MultiViews\n\
     AllowOverride All\n\
     Require all granted\n\
 </Directory>' > /etc/apache2/conf-available/docker-php.conf \
