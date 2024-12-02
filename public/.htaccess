@@ -1,7 +1,11 @@
+Options +FollowSymLinks
 RewriteEngine On
 RewriteBase /
 
-# Se o arquivo ou diretório não existir
+# Forçar processamento de PHP
+AddType application/x-httpd-php .php
+
+# Se o arquivo ou diretório não existir, redirecionar para index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]
@@ -16,6 +20,7 @@ RewriteRule ^(.*)$ index.php [QSA,L]
 <FilesMatch "\.php$">
     Order Allow,Deny
     Allow from all
+    SetHandler application/x-httpd-php
 </FilesMatch>
 
 # Configurações de CORS
