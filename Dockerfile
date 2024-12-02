@@ -3,8 +3,8 @@ FROM php:8.3-apache
 # Instalar extensões do PHP necessárias
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Habilitar mod_rewrite para o Apache
-RUN a2enmod rewrite
+# Habilitar módulos do Apache necessários
+RUN a2enmod rewrite headers
 
 # Configurar o Apache
 RUN echo '\
