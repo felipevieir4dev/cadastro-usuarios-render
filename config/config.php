@@ -2,11 +2,17 @@
 // Função para obter variável de ambiente com fallback
 function getEnvVar($name, $default = null) {
     $value = getenv($name);
+    error_log("Lendo variável de ambiente: $name = " . ($value !== false ? $value : 'não definida, usando default: ' . $default));
     return $value !== false ? $value : $default;
 }
 
+// Debug inicial
+error_log("Iniciando config.php");
+error_log("BASE_DIR: " . (defined('BASE_DIR') ? BASE_DIR : 'não definido'));
+
 // Detectar ambiente
 $isProduction = getEnvVar('RENDER', 'false') === 'true';
+error_log("Ambiente: " . ($isProduction ? 'Produção' : 'Desenvolvimento'));
 
 // Configurações do banco de dados
 $dbConfig = [
@@ -16,20 +22,25 @@ $dbConfig = [
     'pass' => getEnvVar('DB_PASSWORD', '12345678')
 ];
 
-// Configurações de erro baseadas no ambiente
-if ($isProduction) {
-    error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
-    ini_set('display_errors', '0');
-    ini_set('display_startup_errors', '0');
-    ini_set('log_errors', '1');
-    ini_set('error_log', '/var/log/php/error.log');
-} else {
-    error_reporting(getEnvVar('ERROR_REPORTING', E_ALL));
-    ini_set('display_errors', getEnvVar('DISPLAY_ERRORS', '1'));
-    ini_set('display_startup_errors', '1');
-    ini_set('log_errors', '1');
-    ini_set('error_log', BASE_DIR . '/logs/php-error.log');
-}
+// Debug das configurações do banco
+error_log("Configurações do banco de dados:");
+error_log("Host: " . $dbConfig['host']);
+error_log("Database: " . $dbConfig['name']);
+error_log("User: " . $dbConfig['user']);
+
+// Configurações de erro (temporariamente mostrando todos os erros em produção para debug)
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+ini_set('log_errors', '1');
+ini_set('error_log', $isProduction ? '/var/log/php/error.log' : BASE_DIR . '/logs/php-error.log');
+
+// Debug do PHP
+error_log("Versão do PHP: " . PHP_VERSION);
+error_log("Configurações de erro:");
+error_log("display_errors: " . ini_get('display_errors'));
+error_log("error_reporting: " . ini_get('error_reporting'));
+error_log("error_log path: " . ini_get('error_log'));
 
 // Garantir que o diretório de logs existe em desenvolvimento
 if (!$isProduction && !is_dir(BASE_DIR . '/logs')) {
@@ -43,6 +54,8 @@ try {
         $dbConfig['host'],
         $dbConfig['name']
     );
+    
+    error_log("DSN construído: " . $dsn);
 
     // Opções do PDO
     $options = [
@@ -53,7 +66,9 @@ try {
     ];
 
     // Criar conexão PDO
+    error_log("Tentando conectar ao banco de dados...");
     $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass'], $options);
+    error_log("Conexão PDO estabelecida com sucesso!");
     
     // Log de debug para conexão bem-sucedida
     if (!$isProduction) {
