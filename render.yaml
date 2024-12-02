@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: cadastro-usuario
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    numInstances: 1
+    envVars:
+      - key: DB_HOST
+        value: localhost
+      - key: DB_USER
+        value: root
+      - key: DB_PASSWORD
+        value: root
+      - key: DB_NAME
+        value: db_usuario
+      - key: RENDER
+        value: true
+
+databases:
+  - name: cadastro-usuario-db
+    plan: free
