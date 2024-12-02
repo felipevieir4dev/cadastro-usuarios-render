@@ -1,8 +1,8 @@
 <?php
-$host = getenv('DB_HOST') ?: 'localhost';
-$dbname = getenv('DB_NAME') ?: 'db_usuario';
-$user = getenv('DB_USER') ?: 'root';     
-$pass = getenv('DB_PASSWORD') ?: '12345678';         
+$host = 'localhost';  // Use localhost para conexão local
+$dbname = 'db_usuario';
+$user = 'root';     
+$pass = '12345678';         
 
 try {
     $pdo = new PDO(
