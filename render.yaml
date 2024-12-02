@@ -8,7 +8,7 @@ services:
     numInstances: 1
     envVars:
       - key: DB_HOST
-        value: containers-us-west-207.railway.app
+        value: localhost
       - key: DB_USER
         value: root
       - key: DB_PASSWORD
