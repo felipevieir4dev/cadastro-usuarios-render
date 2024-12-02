@@ -12,11 +12,15 @@ services:
       - key: DB_USER
         value: root
       - key: DB_PASSWORD
-        value: root
+        value: 12345678
       - key: DB_NAME
         value: db_usuario
       - key: RENDER
-        value: true
+        value: "true"
+      - key: DISPLAY_ERRORS
+        value: "1"
+      - key: ERROR_REPORTING
+        value: "E_ALL"
 
 databases:
   - name: cadastro-usuario-db
