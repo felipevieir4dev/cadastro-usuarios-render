@@ -15,12 +15,14 @@ RUN echo '\
 </Directory>' > /etc/apache2/conf-available/docker-php.conf \
     && a2enconf docker-php
 
+# Configurar o DocumentRoot do Apache
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+
+# Criar diretório público
+RUN mkdir -p /var/www/html/public
+
 # Copiar os arquivos do projeto
 COPY . /var/www/html/
-
-# Mover o conteúdo da pasta public para a raiz
-RUN mv /var/www/html/public/* /var/www/html/ \
-    && rm -rf /var/www/html/public
 
 # Configurar permissões
 RUN chown -R www-data:www-data /var/www/html
