@@ -1,9 +1,7 @@
 FROM php:8.3-apache
 
-# Instalar extensões do PHP necessárias e dependências
-RUN apt-get update && apt-get install -y \
-    default-mysql-client \
-    && docker-php-ext-install pdo pdo_mysql
+# Instalar extensões do PHP necessárias
+RUN docker-php-ext-install pdo pdo_mysql
 
 # Habilitar módulos do Apache necessários
 RUN a2enmod rewrite headers
@@ -27,7 +25,9 @@ RUN mkdir -p /var/www/html/public
 COPY . /var/www/html/
 
 # Configurar permissões
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 777 /var/www/html/public
 
 # Expor a porta que o Render vai usar
 EXPOSE 80
