@@ -21,7 +21,3 @@ services:
         value: "1"
       - key: ERROR_REPORTING
         value: "E_ALL"
-
-databases:
-  - name: cadastro-usuario-db
-    plan: free
