@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost';
-$dbname = 'db_usuario';
-$user = 'root';     
-$pass = '12345678';         
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbname = getenv('DB_NAME') ?: 'db_usuario';
+$user = getenv('DB_USER') ?: 'root';     
+$pass = getenv('DB_PASSWORD') ?: 'root';         
 
 try {
     $pdo = new PDO(
@@ -15,6 +15,10 @@ try {
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
         ]
     );
+    
+    // Debug da conexão
+    error_log("Conectado ao banco de dados em: $host");
 } catch(PDOException $e) {
+    error_log("Erro na conexão com o banco: " . $e->getMessage());
     die("Erro na conexão: " . $e->getMessage());
 }
