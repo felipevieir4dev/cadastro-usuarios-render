@@ -25,9 +25,7 @@ RUN mkdir -p /var/www/html/public
 COPY . /var/www/html/
 
 # Configurar permissões
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html \
-    && chmod -R 777 /var/www/html/public
+RUN chown -R www-data:www-data /var/www/html
 
 # Expor a porta que o Render vai usar
 EXPOSE 80
