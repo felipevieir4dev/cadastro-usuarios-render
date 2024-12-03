@@ -23,11 +23,11 @@ if ($isProduction) {
 
 // Configurações do banco de dados
 $dbConfig = [
-    'host' => getEnvVar('DB_HOST', 'localhost'),
+    'host' => getEnvVar('DB_HOST', 'db'),
     'port' => getEnvVar('DB_PORT', '3306'),
     'name' => getEnvVar('DB_NAME', 'db_usuario'),
     'user' => getEnvVar('DB_USER', 'root'),
-    'pass' => getEnvVar('DB_PASSWORD', '12345678')
+    'pass' => getEnvVar('DB_PASSWORD', 'root')
 ];
 
 // Função para criar conexão PDO

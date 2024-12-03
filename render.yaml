@@ -8,15 +8,25 @@ services:
     startCommand: docker run -p $PORT:80 --env-file .env cadastro-usuario
     envVars:
       - key: DB_HOST
-        sync: false
+        fromDatabase:
+          name: mysql_cadastro
+          property: host
       - key: DB_NAME
-        value: db_usuario
+        fromDatabase:
+          name: mysql_cadastro
+          property: database
       - key: DB_USER
-        sync: false
+        fromDatabase:
+          name: mysql_cadastro
+          property: user
       - key: DB_PASSWORD
-        sync: false
+        fromDatabase:
+          name: mysql_cadastro
+          property: password
       - key: DB_PORT
-        value: "3306"
+        fromDatabase:
+          name: mysql_cadastro
+          property: port
       - key: RENDER
         value: "true"
       - key: DISPLAY_ERRORS
