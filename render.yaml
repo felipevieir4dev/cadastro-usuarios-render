@@ -1,4 +1,25 @@
 services:
+  # Serviço do MySQL
+  - type: pserv
+    name: mysql
+    env: docker
+    plan: free
+    dockerCommand: mysqld --default-authentication-plugin=mysql_native_password
+    disk:
+      name: mysql
+      mountPath: /var/lib/mysql
+      sizeGB: 1
+    envVars:
+      - key: MYSQL_DATABASE
+        value: db_usuario
+      - key: MYSQL_USER
+        value: admin
+      - key: MYSQL_PASSWORD
+        value: admin123
+      - key: MYSQL_ROOT_PASSWORD
+        value: root123
+
+  # Serviço Web PHP
   - type: web
     name: cadastro-usuario
     env: docker
@@ -12,11 +33,14 @@ services:
       - cadastro-usuario.onrender.com
     envVars:
       - key: DB_HOST
-        value: containers-us-west-207.railway.app
+        fromService:
+          type: pserv
+          name: mysql
+          property: host
       - key: DB_USER
-        value: root
+        value: admin
       - key: DB_PASSWORD
-        value: 12345678
+        value: admin123
       - key: DB_NAME
         value: db_usuario
       - key: DB_PORT
