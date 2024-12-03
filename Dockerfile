@@ -43,15 +43,15 @@ RUN echo '\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Configurar variáveis de ambiente para o PHP
-ENV DB_HOST=${DB_HOST} \
-    DB_USER=${DB_USER} \
-    DB_PASSWORD=${DB_PASSWORD} \
-    DB_NAME=${DB_NAME} \
-    DB_PORT=${DB_PORT} \
-    RENDER=${RENDER} \
-    DISPLAY_ERRORS=${DISPLAY_ERRORS} \
-    ERROR_REPORTING=${ERROR_REPORTING}
+# Definir variáveis de ambiente
+ENV DB_HOST= \
+    DB_USER= \
+    DB_PASSWORD= \
+    DB_NAME= \
+    DB_PORT= \
+    RENDER= \
+    DISPLAY_ERRORS= \
+    ERROR_REPORTING=
 
 # Criar diretório de trabalho
 WORKDIR /var/www/html
@@ -59,15 +59,24 @@ WORKDIR /var/www/html
 # Copiar os arquivos do projeto
 COPY . .
 
+# Script de inicialização para configurar variáveis de ambiente
+RUN echo '#!/bin/sh\n\
+echo "Starting with configuration:"\n\
+echo "DB_HOST=$DB_HOST"\n\
+echo "DB_PORT=$DB_PORT"\n\
+echo "DB_NAME=$DB_NAME"\n\
+echo "DB_USER=$DB_USER"\n\
+apache2-foreground\n\
+' > /usr/local/bin/docker-entrypoint.sh && \
+    chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Verificar e ajustar permissões
-RUN ls -la /var/www/html/public && \
-    chown -R www-data:www-data /var/www/html && \
+RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html && \
-    chmod -R 644 /var/www/html/public/*.php && \
-    chmod 755 /var/www/html/public
+    find /var/www/html/public -type f -name "*.php" -exec chmod 644 {} \;
 
 # Expor a porta 80
 EXPOSE 80
 
-# Comando para iniciar o Apache
-CMD ["apache2-foreground"]
+# Usar o script de inicialização
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
