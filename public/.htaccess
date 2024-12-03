@@ -14,23 +14,28 @@ RewriteCond %{HTTPS} off
 RewriteCond %{HTTP_HOST} ^(.*)\.onrender\.com$ [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
 
-# Redirecionar todas as requisições para index.php se o arquivo/diretório não existir
+# Permitir acesso direto aos arquivos de teste
+RewriteRule ^(test_db|phpinfo|health|info)\.php$ - [L]
+
+# Redirecionar todas as outras requisições para index.php se o arquivo/diretório não existir
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
 
-# Configurações de segurança
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-XSS-Protection "1; mode=block"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
+# Configurações do PHP
+php_value display_errors On
+php_value error_reporting E_ALL
+php_value memory_limit 128M
+php_value post_max_size 20M
+php_value upload_max_filesize 10M
 
-# PHP configurações
-<IfModule mod_php.c>
-    php_value upload_max_filesize 10M
-    php_value post_max_size 10M
-    php_value max_execution_time 30
-    php_value max_input_time 60
-</IfModule>
+# Headers de segurança
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set X-XSS-Protection "1; mode=block"
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Permitir CORS para o domínio do Render
+Header always set Access-Control-Allow-Origin "https://cadastro-usuario.onrender.com"
+Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type"

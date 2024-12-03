@@ -4,7 +4,9 @@ FROM php:8.3-apache
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
-    && docker-php-ext-install pdo_mysql mysqli zip
+    && docker-php-ext-install pdo_mysql mysqli zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Habilitar módulos do Apache necessários
 RUN a2enmod rewrite headers
@@ -51,12 +53,18 @@ ENV DB_HOST=${DB_HOST} \
     DISPLAY_ERRORS=${DISPLAY_ERRORS} \
     ERROR_REPORTING=${ERROR_REPORTING}
 
-# Copiar os arquivos do projeto
-COPY . /var/www/html/
+# Criar diretório de trabalho
+WORKDIR /var/www/html
 
-# Configurar permissões
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
+# Copiar os arquivos do projeto
+COPY . .
+
+# Verificar e ajustar permissões
+RUN ls -la /var/www/html/public && \
+    chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html && \
+    chmod -R 644 /var/www/html/public/*.php && \
+    chmod 755 /var/www/html/public
 
 # Expor a porta 80
 EXPOSE 80
