@@ -5,7 +5,8 @@ services:
     env: docker
     plan: free
     region: oregon
-    dockerCommand: mysqld --default-authentication-plugin=mysql_native_password
+    image: mysql:8.0
+    command: mysqld --default-authentication-plugin=mysql_native_password
     disk:
       name: mysql
       mountPath: /var/lib/mysql
@@ -19,8 +20,6 @@ services:
         value: admin123
       - key: MYSQL_ROOT_PASSWORD
         value: root123
-    healthCheckPath: /
-    healthCheckTimeout: 100
 
   # Serviço Web PHP
   - type: web
@@ -28,7 +27,18 @@ services:
     env: docker
     region: oregon
     buildCommand: docker build -t cadastro-usuario .
-    startCommand: docker run -p $PORT:80 cadastro-usuario
+    startCommand: >-
+      docker run 
+      -p $PORT:80 
+      -e DB_HOST=$MYSQL_CADASTRO_HOST 
+      -e DB_PORT=3306 
+      -e DB_NAME=db_usuario 
+      -e DB_USER=admin 
+      -e DB_PASSWORD=admin123 
+      -e RENDER=true 
+      -e DISPLAY_ERRORS=1 
+      -e ERROR_REPORTING=E_ALL 
+      cadastro-usuario
     dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
@@ -38,28 +48,10 @@ services:
     domains:
       - cadastro-usuario.onrender.com
     envVars:
-      - key: DB_HOST
+      - key: MYSQL_CADASTRO_HOST
         fromService:
           type: pserv
           name: mysql-cadastro
           property: host
-      - key: DB_USER
-        value: admin
-      - key: DB_PASSWORD
-        value: admin123
-      - key: DB_NAME
-        value: db_usuario
-      - key: DB_PORT
-        value: "3306"
-      - key: RENDER
-        value: "true"
-      - key: DISPLAY_ERRORS
-        value: "1"
-      - key: ERROR_REPORTING
-        value: "E_ALL"
       - key: PORT
         value: "10000"
-    disk:
-      name: data
-      mountPath: /var/www/html/data
-      sizeGB: 1
