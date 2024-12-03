@@ -1,57 +1,35 @@
 services:
-  # Serviço do MySQL
-  - type: pserv
-    name: mysql-cadastro
-    env: docker
-    plan: free
-    region: oregon
-    image: mysql:8.0
-    command: mysqld --default-authentication-plugin=mysql_native_password
-    disk:
-      name: mysql
-      mountPath: /var/lib/mysql
-      sizeGB: 1
-    envVars:
-      - key: MYSQL_DATABASE
-        value: db_usuario
-      - key: MYSQL_USER
-        value: admin
-      - key: MYSQL_PASSWORD
-        value: admin123
-      - key: MYSQL_ROOT_PASSWORD
-        value: root123
-
-  # Serviço Web PHP
   - type: web
     name: cadastro-usuario
     env: docker
     region: oregon
-    buildCommand: docker build -t cadastro-usuario .
-    startCommand: >-
-      docker run 
-      -p $PORT:80 
-      -e DB_HOST=$MYSQL_CADASTRO_HOST 
-      -e DB_PORT=3306 
-      -e DB_NAME=db_usuario 
-      -e DB_USER=admin 
-      -e DB_PASSWORD=admin123 
-      -e RENDER=true 
-      -e DISPLAY_ERRORS=1 
-      -e ERROR_REPORTING=E_ALL 
-      cadastro-usuario
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
     plan: free
-    numInstances: 1
+    buildCommand: docker build -t cadastro-usuario .
+    startCommand: docker run -p $PORT:80 --env-file .env cadastro-usuario
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        value: db_usuario
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      - key: RENDER
+        value: "true"
+      - key: DISPLAY_ERRORS
+        value: "1"
+      - key: ERROR_REPORTING
+        value: "E_ALL"
     healthCheckPath: /health.php
     healthCheckTimeout: 100
-    domains:
-      - cadastro-usuario.onrender.com
-    envVars:
-      - key: MYSQL_CADASTRO_HOST
-        fromService:
-          type: pserv
-          name: mysql-cadastro
-          property: host
-      - key: PORT
-        value: "10000"
+    autoDeploy: false
+
+databases:
+  - name: mysql_cadastro
+    plan: free
+    type: mysql
+    region: oregon
+    ipAllowList: []
