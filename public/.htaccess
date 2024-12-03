@@ -1,7 +1,36 @@
+Options -Indexes +FollowSymLinks
+
+# Habilitar rewrite engine
 RewriteEngine On
 RewriteBase /
 
-# Redirecionar para index.php se o arquivo não existir
+# Redirecionar erros para páginas personalizadas
+ErrorDocument 404 /404.php
+ErrorDocument 500 /500.php
+
+# Forçar HTTPS no Render
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} ^(.*)\.onrender\.com$ [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+
+# Redirecionar todas as requisições para index.php se o arquivo/diretório não existir
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [L]
+RewriteRule ^ index.php [QSA,L]
+
+# Configurações de segurança
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# PHP configurações
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 30
+    php_value max_input_time 60
+</IfModule>

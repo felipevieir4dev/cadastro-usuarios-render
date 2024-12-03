@@ -1,14 +1,19 @@
 FROM php:8.3-apache
 
-# Instalar extensões do PHP necessárias
-RUN docker-php-ext-install pdo_mysql
+# Instalar dependências e extensões do PHP necessárias
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    && docker-php-ext-install pdo_mysql mysqli zip
 
 # Habilitar módulos do Apache necessários
-RUN a2enmod rewrite
+RUN a2enmod rewrite headers
 
 # Configurar o PHP
 RUN echo "display_errors = On" >> "$PHP_INI_DIR/conf.d/error-logging.ini" && \
-    echo "error_log = /dev/stderr" >> "$PHP_INI_DIR/conf.d/error-logging.ini"
+    echo "error_log = /dev/stderr" >> "$PHP_INI_DIR/conf.d/error-logging.ini" && \
+    echo "max_execution_time = 30" >> "$PHP_INI_DIR/conf.d/error-logging.ini" && \
+    echo "default_socket_timeout = 60" >> "$PHP_INI_DIR/conf.d/error-logging.ini"
 
 # Configurar o Apache
 RUN echo '\
@@ -17,6 +22,7 @@ RUN echo '\
     ErrorLog /dev/stderr\n\
     CustomLog /dev/stdout combined\n\
     <Directory /var/www/html/public>\n\
+        Options -Indexes +FollowSymLinks\n\
         AllowOverride All\n\
         Require all granted\n\
     </Directory>\n\
@@ -36,12 +42,8 @@ ENV DB_HOST=${DB_HOST} \
 COPY . /var/www/html/
 
 # Configurar permissões
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html
 
-# Expor a porta que o Render vai usar
+# Expor a porta 80
 EXPOSE 80
-
-# Configurar o Apache para usar a porta do Render
-ENV PORT=80
-CMD sed -i "s/80/$PORT/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && \
-    apache2-foreground
