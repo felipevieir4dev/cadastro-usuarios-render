@@ -22,6 +22,16 @@ RUN echo '\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
+# Configurar variáveis de ambiente para o PHP
+ENV DB_HOST=${DB_HOST} \
+    DB_USER=${DB_USER} \
+    DB_PASSWORD=${DB_PASSWORD} \
+    DB_NAME=${DB_NAME} \
+    DB_PORT=${DB_PORT} \
+    RENDER=${RENDER} \
+    DISPLAY_ERRORS=${DISPLAY_ERRORS} \
+    ERROR_REPORTING=${ERROR_REPORTING}
+
 # Copiar os arquivos do projeto
 COPY . /var/www/html/
 

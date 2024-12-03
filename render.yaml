@@ -8,7 +8,7 @@ services:
     numInstances: 1
     envVars:
       - key: DB_HOST
-        value: localhost
+        value: containers-us-west-207.railway.app
       - key: DB_USER
         value: root
       - key: DB_PASSWORD
@@ -21,3 +21,5 @@ services:
         value: "1"
       - key: ERROR_REPORTING
         value: "E_ALL"
+      - key: DB_PORT
+        value: "3306"
