@@ -6,6 +6,10 @@ services:
     dockerContext: .
     plan: free
     numInstances: 1
+    healthCheckPath: /test_db.php
+    healthCheckTimeout: 100
+    domains:
+      - cadastro-usuario.onrender.com
     envVars:
       - key: DB_HOST
         value: containers-us-west-207.railway.app
@@ -15,11 +19,17 @@ services:
         value: 12345678
       - key: DB_NAME
         value: db_usuario
+      - key: DB_PORT
+        value: "3306"
       - key: RENDER
         value: "true"
       - key: DISPLAY_ERRORS
         value: "1"
       - key: ERROR_REPORTING
         value: "E_ALL"
-      - key: DB_PORT
-        value: "3306"
+      - key: PHP_INI_SCAN_DIR
+        value: "/var/www/html/config:/usr/local/etc/php/conf.d"
+    disk:
+      name: tmp
+      mountPath: /tmp
+      sizeGB: 1
