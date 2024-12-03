@@ -9,11 +9,24 @@ RUN apt-get update && apt-get install -y \
 # Habilitar módulos do Apache necessários
 RUN a2enmod rewrite headers
 
+# Criar diretório para logs do PHP
+RUN mkdir -p /var/log/php && \
+    chown www-data:www-data /var/log/php && \
+    chmod 755 /var/log/php
+
 # Configurar o PHP
-RUN echo "display_errors = On" >> "$PHP_INI_DIR/conf.d/error-logging.ini" && \
-    echo "error_log = /dev/stderr" >> "$PHP_INI_DIR/conf.d/error-logging.ini" && \
-    echo "max_execution_time = 30" >> "$PHP_INI_DIR/conf.d/error-logging.ini" && \
-    echo "default_socket_timeout = 60" >> "$PHP_INI_DIR/conf.d/error-logging.ini"
+RUN { \
+    echo 'display_errors = On'; \
+    echo 'log_errors = On'; \
+    echo 'error_log = /dev/stderr'; \
+    echo 'error_reporting = E_ALL'; \
+    echo 'max_execution_time = 30'; \
+    echo 'default_socket_timeout = 60'; \
+    echo 'memory_limit = 128M'; \
+    echo 'post_max_size = 20M'; \
+    echo 'upload_max_filesize = 10M'; \
+    echo 'max_input_time = 60'; \
+} > /usr/local/etc/php/conf.d/custom.ini
 
 # Configurar o Apache
 RUN echo '\
@@ -47,3 +60,6 @@ RUN chown -R www-data:www-data /var/www/html && \
 
 # Expor a porta 80
 EXPOSE 80
+
+# Comando para iniciar o Apache
+CMD ["apache2-foreground"]
